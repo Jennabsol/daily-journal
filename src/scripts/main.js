@@ -2,29 +2,35 @@ const FormManager = require("./JournalForm")
 const dataManager = require("./DataManager")
 const listEntry = require("./entryList")
 
-// Render the journal entry form
-document.querySelector("#journalForm").innerHTML = FormManager.renderEntryForm()
 
-// Add an event listener for the save button
+
+document.querySelector("#journalForm").innerHTML = FormManager.renderEntryForm()
+const editMode = {
+    "enabled": false,
+    "entryId": null
+}
+
 document.querySelector("#saveEntryButton").addEventListener("click", () => {
-    // Get form field values
-    // Create object from them
-    // Add timestamp
+
     const newEntry = {
         title: document.querySelector("#entryTitle").value,
         content: document.querySelector("#entryContent").value,
         date: Date.now()
     }
+    if (editMode.enabled === false) {
 
-    // POST to API
-    dataManager.saveJournalEntry(newEntry).then(() => {
-        // Clear the form fields
-        FormManager.clearForm()
-        listEntry()
-
-        // Put HTML representation on the DOM
-    })
-
+        dataManager.saveJournalEntry(newEntry).then(() => {
+            FormManager.clearForm()
+            listEntry()
+        })
+    } else {
+        dataManager.editJournalEntry(newEntry, editMode.entryId).then(() => {
+            FormManager.clearForm()
+            editMode.enabled = false
+            editMode.entryId = null
+            listEntry()
+        })
+    }
 })
 
 document.querySelector("#entryDiv").addEventListener("click", e => {
@@ -37,9 +43,11 @@ document.querySelector("#entryDiv").addEventListener("click", e => {
             .then(entry => {
                 document.querySelector("#entryTitle").value = entry.title
                 document.querySelector("#entryContent").value = entry.content
+                editMode.enabled = true
+                editMode.entryId = id
+
             })
     }
 
 })
 listEntry()
-// console.log(dataManager.getJournalEntry())
