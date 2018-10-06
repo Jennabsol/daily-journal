@@ -6,14 +6,14 @@ let entryDiv = document.querySelector("#entryDiv")
 
 function listEntry() {
     entryDiv.innerHTML = ""
-    let data = dataManager.getJournalEntry()
+dataManager.getJournalEntry()
         .then(res => {
             res.forEach(entry => {
                 let entryComponent = eachEntry(entry.title, entry.content, entry.id)
                 writeToDom(entryComponent)
             });
         })
-console.log(data)
+
 }
 
 
